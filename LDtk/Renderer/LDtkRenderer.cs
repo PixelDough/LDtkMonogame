@@ -89,6 +89,27 @@ public class LDtkRenderer : IDisposable
         PrerenderedLevels.Add(level.Identifier, renderLevel);
         graphicsDevice.SetRenderTarget(null);
     }
+    
+    public void PrerenderLayer(LayerInstance layer)
+    {
+        if (PrerenderedLevels.ContainsKey(layer.Identifier))
+        {
+            return;
+        }
+
+        RenderedLevel renderLayer = new();
+
+        SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        {
+            Texture2D renderedLayer = RenderLayer(layer);
+            renderLayer.Layers = new[] { renderedLayer };
+        }
+
+        SpriteBatch.End();
+
+        PrerenderedLevels.Add(layer.Identifier, renderLayer);
+        graphicsDevice.SetRenderTarget(null);
+    }
 
     Texture2D[] RenderLayers(LDtkLevel level)
     {
@@ -104,59 +125,74 @@ public class LDtkRenderer : IDisposable
             return layers.ToArray();
         }
 
+        layers = RenderLayers(level.LayerInstances)
+
+        return layers.ToArray();
+    }
+    
+    Texture2D[] RenderLayers(LayerInstance[] layers)
+    {
+        List<Texture2D> layers = [];
+        
         // Render Tile, Auto and Int grid layers
         for (int i = level.LayerInstances.Length - 1; i >= 0; i--)
         {
             LayerInstance layer = level.LayerInstances[i];
 
-            if (layer._TilesetRelPath == null)
+            layers.Add(RenderLayer(layer));
+        }
+
+        return layers.ToArray();
+    }
+
+    Texture2D RenderLayer(LayerInstance layer)
+    {
+        if (layer._TilesetRelPath == null)
+        {
+            continue;
+        }
+
+        if (layer._Type == LayerType.Entities)
+        {
+            continue;
+        }
+
+        Texture2D texture = GetTexture(level, layer._TilesetRelPath);
+
+        int width = layer._CWid * layer._GridSize;
+        int height = layer._CHei * layer._GridSize;
+        RenderTarget2D renderTarget = new(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+
+        graphicsDevice.SetRenderTarget(renderTarget);
+
+        switch (layer._Type)
+        {
+            case LayerType.Tiles:
+            foreach (TileInstance tile in layer.GridTiles.Where(_ => layer._TilesetDefUid.HasValue))
             {
-                continue;
+                Vector2 position = new(tile.Px.X + layer._PxTotalOffsetX, tile.Px.Y + layer._PxTotalOffsetY);
+                Rectangle rect = new(tile.Src.X, tile.Src.Y, layer._GridSize, layer._GridSize);
+                SpriteEffects mirror = (SpriteEffects)tile.F;
+                SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
             }
+            break;
 
-            if (layer._Type == LayerType.Entities)
+            case LayerType.AutoLayer:
+            case LayerType.IntGrid:
+            if (layer.AutoLayerTiles.Length > 0)
             {
-                continue;
-            }
-
-            Texture2D texture = GetTexture(level, layer._TilesetRelPath);
-
-            int width = layer._CWid * layer._GridSize;
-            int height = layer._CHei * layer._GridSize;
-            RenderTarget2D renderTarget = new(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
-
-            graphicsDevice.SetRenderTarget(renderTarget);
-            layers.Add(renderTarget);
-
-            switch (layer._Type)
-            {
-                case LayerType.Tiles:
-                foreach (TileInstance tile in layer.GridTiles.Where(_ => layer._TilesetDefUid.HasValue))
+                foreach (TileInstance tile in layer.AutoLayerTiles.Where(_ => layer._TilesetDefUid.HasValue))
                 {
                     Vector2 position = new(tile.Px.X + layer._PxTotalOffsetX, tile.Px.Y + layer._PxTotalOffsetY);
                     Rectangle rect = new(tile.Src.X, tile.Src.Y, layer._GridSize, layer._GridSize);
                     SpriteEffects mirror = (SpriteEffects)tile.F;
                     SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
                 }
-                break;
-
-                case LayerType.AutoLayer:
-                case LayerType.IntGrid:
-                if (layer.AutoLayerTiles.Length > 0)
-                {
-                    foreach (TileInstance tile in layer.AutoLayerTiles.Where(_ => layer._TilesetDefUid.HasValue))
-                    {
-                        Vector2 position = new(tile.Px.X + layer._PxTotalOffsetX, tile.Px.Y + layer._PxTotalOffsetY);
-                        Rectangle rect = new(tile.Src.X, tile.Src.Y, layer._GridSize, layer._GridSize);
-                        SpriteEffects mirror = (SpriteEffects)tile.F;
-                        SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
-                    }
-                }
-                break;
             }
+            break;
         }
 
-        return layers.ToArray();
+        return renderTarget;
     }
 
     Texture2D RenderBackgroundToLayer(LDtkLevel level)
@@ -221,6 +257,21 @@ public class LDtkRenderer : IDisposable
             for (int i = 0; i < prerenderedLevel.Layers.Length; i++)
             {
                 SpriteBatch.Draw(prerenderedLevel.Layers[i], level.Position.ToVector2(), Color.White);
+            }
+        }
+        else
+        {
+            throw new LDtkException($"No prerendered level with Identifier {level.Identifier} found.");
+        }
+    }
+    
+    public void RenderPrerenderedLayer(LayerInstance layer, Point position)
+    {
+        if (PrerenderedLevels.TryGetValue(layer.Identifier, out RenderedLevel prerenderedLayer))
+        {
+            for (int i = 0; i < prerenderedLayer.Layers.Length; i++)
+            {
+                SpriteBatch.Draw(prerenderedLayer.Layers[i], position.ToVector2(), Color.White);
             }
         }
         else
