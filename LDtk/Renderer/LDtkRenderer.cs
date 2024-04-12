@@ -22,10 +22,10 @@ public class LDtkRenderer : IDisposable
     public SpriteBatch SpriteBatch { get; set; }
 
     /// <summary> Gets or sets the levels identifier to layers Dictionary. </summary>
-    Dictionary<string, RenderedLevel> PrerenderedLevels { get; } = [];
+    Dictionary<string, RenderedLevel> PrerenderedLevels { get; } = new();
 
     /// <summary> Gets or sets the levels identifier to layers Dictionary. </summary>
-    Dictionary<string, Texture2D> TilemapCache { get; } = [];
+    Dictionary<string, Texture2D> TilemapCache { get; } = new();
 
     readonly Texture2D pixel;
     readonly Texture2D error;
@@ -89,10 +89,15 @@ public class LDtkRenderer : IDisposable
         PrerenderedLevels.Add(level.Identifier, renderLevel);
         graphicsDevice.SetRenderTarget(null);
     }
-    
-    public void PrerenderLayer(LayerInstance layer)
+
+    /// <summary> Prerender out a specific layer from a level to a texture to optimize the rendering process. </summary>
+    /// <param name="layer">The layer to prerender.</param>
+    /// <param name="level">The level the layer belongs to.</param>
+    /// <exception cref="Exception">The layer already has been prerendered.</exception>
+    public void PrerenderLayer(LayerInstance layer, LDtkLevel level)
     {
-        if (PrerenderedLevels.ContainsKey(layer.Identifier))
+        string identifier = layer.Iid.ToString();
+        if (PrerenderedLevels.ContainsKey(identifier))
         {
             return;
         }
@@ -101,19 +106,19 @@ public class LDtkRenderer : IDisposable
 
         SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
         {
-            Texture2D renderedLayer = RenderLayer(layer);
+            Texture2D renderedLayer = RenderLayer(layer, level);
             renderLayer.Layers = new[] { renderedLayer };
         }
 
         SpriteBatch.End();
 
-        PrerenderedLevels.Add(layer.Identifier, renderLayer);
+        PrerenderedLevels.Add(identifier, renderLayer);
         graphicsDevice.SetRenderTarget(null);
     }
 
     Texture2D[] RenderLayers(LDtkLevel level)
     {
-        List<Texture2D> layers = [];
+        List<Texture2D> layers = new();
 
         if (level.BgRelPath != null)
         {
@@ -125,38 +130,37 @@ public class LDtkRenderer : IDisposable
             return layers.ToArray();
         }
 
-        layers = RenderLayers(level.LayerInstances)
+        layers.AddRange(RenderLayers(level.LayerInstances, level));
 
         return layers.ToArray();
     }
     
-    Texture2D[] RenderLayers(LayerInstance[] layers)
+    Texture2D[] RenderLayers(LayerInstance[] layers, LDtkLevel level)
     {
-        List<Texture2D> layers = [];
+        List<Texture2D> results = new();
         
         // Render Tile, Auto and Int grid layers
-        for (int i = level.LayerInstances.Length - 1; i >= 0; i--)
+        for (int i = layers.Length - 1; i >= 0; i--)
         {
-            LayerInstance layer = level.LayerInstances[i];
+            LayerInstance layer = layers[i];
 
-            layers.Add(RenderLayer(layer));
+            if (layer._TilesetRelPath == null)
+            {
+                continue;
+            }
+
+            if (layer._Type == LayerType.Entities)
+            {
+                continue;
+            }
+            results.Add(RenderLayer(layer, level));
         }
 
-        return layers.ToArray();
+        return results.ToArray();
     }
 
-    Texture2D RenderLayer(LayerInstance layer)
+    Texture2D RenderLayer(LayerInstance layer, LDtkLevel level)
     {
-        if (layer._TilesetRelPath == null)
-        {
-            continue;
-        }
-
-        if (layer._Type == LayerType.Entities)
-        {
-            continue;
-        }
-
         Texture2D texture = GetTexture(level, layer._TilesetRelPath);
 
         int width = layer._CWid * layer._GridSize;
@@ -264,19 +268,24 @@ public class LDtkRenderer : IDisposable
             throw new LDtkException($"No prerendered level with Identifier {level.Identifier} found.");
         }
     }
-    
-    public void RenderPrerenderedLayer(LayerInstance layer, Point position)
+
+    /// <summary> Render the prerendered layer you created from PrerenderLayer(). </summary>
+    /// <param name="layer">Layer to prerender</param>
+    /// <param name="level">Level the layer belongs to</param>
+    /// <exception cref="LDtkException"></exception>
+    public void RenderPrerenderedLayer(LayerInstance layer, LDtkLevel level)
     {
-        if (PrerenderedLevels.TryGetValue(layer.Identifier, out RenderedLevel prerenderedLayer))
+        string identifier = layer.Iid.ToString();
+        if (PrerenderedLevels.TryGetValue(identifier, out RenderedLevel prerenderedLayer))
         {
-            for (int i = 0; i < prerenderedLayer.Layers.Length; i++)
+            foreach (var texture in prerenderedLayer.Layers)
             {
-                SpriteBatch.Draw(prerenderedLayer.Layers[i], position.ToVector2(), Color.White);
+                SpriteBatch.Draw(texture, level.Position.ToVector2(), Color.White);
             }
         }
         else
         {
-            throw new LDtkException($"No prerendered level with Identifier {level.Identifier} found.");
+            throw new LDtkException($"No prerendered layer with Identifier {identifier} found.");
         }
     }
 

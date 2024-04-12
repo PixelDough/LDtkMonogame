@@ -187,7 +187,7 @@ static class LDtkFieldParser
             }
             else
             {
-                Vector2[] points = JsonSerializer.Deserialize<Vector2[]>(element.ToString(), Constants.SerializeOptions) ?? [];
+                Vector2[] points = JsonSerializer.Deserialize<Vector2[]>(element.ToString(), Constants.SerializeOptions) ?? Array.Empty<Vector2>();
                 for (int i = 0; i < points.Length; i++)
                 {
                     points[i] *= new Vector2(gridSize, gridSize);

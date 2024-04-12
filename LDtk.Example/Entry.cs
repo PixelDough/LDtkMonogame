@@ -21,8 +21,8 @@ public class Entry : Game
     LDtkFile file;
     LDtkWorld world;
     LDtkRenderer renderer;
-    readonly List<EnemyEntity> enemies = [];
-    readonly List<BulletEntity> bullets = [];
+    readonly List<EnemyEntity> enemies = new();
+    readonly List<BulletEntity> bullets = new();
     PlayerEntity player;
     GunEntity gun;
     Camera camera;

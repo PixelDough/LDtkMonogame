@@ -147,7 +147,7 @@ public class PlayerEntity
         Point topLeftGrid = collisions.FromWorldToGridSpace(topleft);
         Point bottomRightGrid = collisions.FromWorldToGridSpace(bottomRight + (Vector2.One * collisions.TileSize));
 
-        tiles = [];
+        tiles = new List<Box>();
 
         for (int x = topLeftGrid.X; x < bottomRightGrid.X; x++)
         {
@@ -161,7 +161,7 @@ public class PlayerEntity
             }
         }
 
-        List<KeyValuePair<int, float>> tilesDistance = [];
+        List<KeyValuePair<int, float>> tilesDistance = new();
 
         // get values to be sorted
         for (int i = 0; i < tiles.Count; i++)

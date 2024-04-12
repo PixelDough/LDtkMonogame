@@ -11,7 +11,7 @@ public class LDtkIntGrid
     public int TileSize { get; set; }
 
     /// <summary> Gets or sets the underlying values of the int grid. </summary>
-    public int[] Values { get; set; } = [];
+    public int[] Values { get; set; } = Array.Empty<int>();
 
     /// <summary> Gets or sets worldspace start Position of the intgrid. </summary>
     public Point WorldPosition { get; set; }

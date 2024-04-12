@@ -172,7 +172,7 @@ public partial class LDtkLevel
     public T[] GetEntities<T>()
         where T : new()
     {
-        List<T> entities = [];
+        List<T> entities = new();
 
         foreach (LayerInstance layer in LayerInstances ?? Array.Empty<LayerInstance>())
         {
@@ -191,7 +191,7 @@ public partial class LDtkLevel
             }
         }
 
-        return [.. entities];
+        return entities.ToArray();
     }
 
     T GetEntityFromInstance<T>(EntityInstance entityInstance)
