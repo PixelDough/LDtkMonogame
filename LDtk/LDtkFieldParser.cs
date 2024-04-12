@@ -39,18 +39,18 @@ static class LDtkFieldParser
     public static void ParseBaseEntityFields<T>(T entity, EntityInstance entityInstance, LDtkLevel level)
         where T : new()
     {
-        ParseBaseField(entity, nameof(ILDtkEntity.Uid), entityInstance.DefUid);
+        ParseBaseField(entity, nameof(ILDtkEntity.Uid), entityInstance.DefinitionUid);
         ParseBaseField(entity, nameof(ILDtkEntity.Iid), entityInstance.Iid);
-        ParseBaseField(entity, nameof(ILDtkEntity.Identifier), entityInstance._Identifier);
-        ParseBaseField(entity, nameof(ILDtkEntity.Position), (entityInstance.Px + level.Position).ToVector2());
-        ParseBaseField(entity, nameof(ILDtkEntity.Pivot), entityInstance._Pivot);
+        ParseBaseField(entity, nameof(ILDtkEntity.Identifier), entityInstance.Identifier);
+        ParseBaseField(entity, nameof(ILDtkEntity.Position), (entityInstance.PixelCoord + level.Position).ToVector2());
+        ParseBaseField(entity, nameof(ILDtkEntity.Pivot), entityInstance.Pivot);
         ParseBaseField(entity, nameof(ILDtkEntity.Size), new Vector2(entityInstance.Width, entityInstance.Height));
-        ParseBaseField(entity, nameof(ILDtkEntity.SmartColor), entityInstance._SmartColor);
+        ParseBaseField(entity, nameof(ILDtkEntity.SmartColor), entityInstance.SmartColor);
 
-        if (entityInstance._Tile != null)
+        if (entityInstance.Tile != null)
         {
-            TilesetRectangle tileDefinition = entityInstance._Tile;
-            Rectangle rect = new(tileDefinition.X, tileDefinition.Y, tileDefinition.W, tileDefinition.H);
+            TilesetRectangle tileDefinition = entityInstance.Tile;
+            Rectangle rect = new(tileDefinition.X, tileDefinition.Y, tileDefinition.Width, tileDefinition.Height);
             ParseBaseField(entity, nameof(ILDtkEntity.Tile), rect);
         }
     }
@@ -59,7 +59,7 @@ static class LDtkFieldParser
     {
         foreach (FieldInstance field in fields)
         {
-            string variableName = field._Identifier;
+            string variableName = field.Identifier;
             PropertyInfo? variableDef = typeof(T).GetProperty(variableName);
 
             if (variableDef == null)
@@ -67,14 +67,14 @@ static class LDtkFieldParser
                 throw new LDtkException($"Field {variableName} does not exist on {typeof(T).Name}");
             }
 
-            if (field._Value == null)
+            if (field.Value == null)
             {
                 continue;
             }
 
-            JsonElement element = (JsonElement)field._Value;
+            JsonElement element = (JsonElement)field.Value;
 
-            if (level != null && field._Type.Contains(Field.PointType))
+            if (level != null && field.Type.Contains(Field.PointType))
             {
                 HandlePoints(classFields, level, field, variableDef, element);
             }
@@ -91,8 +91,8 @@ static class LDtkFieldParser
 
                     case JsonValueKind.String:
                     Type t = Nullable.GetUnderlyingType(variableDef.PropertyType) ?? variableDef.PropertyType;
-                    bool isEnum = field._Type.Split('.')[0].Contains("Enum");
-                    bool isColor = field._Type.Split('.')[0].Contains("Color");
+                    bool isEnum = field.Type.Split('.')[0].Contains("Enum");
+                    bool isColor = field.Type.Split('.')[0].Contains("Color");
 
                     if (isEnum)
                     {
@@ -100,7 +100,7 @@ static class LDtkFieldParser
                     }
                     else if (isColor)
                     {
-                        variableDef.SetValue(classFields, ParseStringToColor(field._Value.ToString()!, 255));
+                        variableDef.SetValue(classFields, ParseStringToColor(field.Value.ToString()!, 255));
                     }
                     else
                     {
@@ -152,7 +152,7 @@ static class LDtkFieldParser
     {
         int gridSize = GetGridSize(level);
 
-        if (field._Type == Field.PointType)
+        if (field.Type == Field.PointType)
         {
             if (variableDef.PropertyType == typeof(Point))
             {
@@ -171,7 +171,7 @@ static class LDtkFieldParser
                 variableDef.SetValue(classFields, point);
             }
         }
-        else if (field._Type == Field.PointArrayType)
+        else if (field.Type == Field.PointArrayType)
         {
             if (variableDef.PropertyType.GetElementType() == typeof(Point))
             {
@@ -205,9 +205,9 @@ static class LDtkFieldParser
         int gridSize = 0;
         for (int j = 0; j < level.LayerInstances?.Length; j++)
         {
-            if (level.LayerInstances[j]._Type == LayerType.Entities)
+            if (level.LayerInstances[j].Type == LayerType.Entities)
             {
-                gridSize = level.LayerInstances[j]._GridSize;
+                gridSize = level.LayerInstances[j].GridSize;
             }
         }
 

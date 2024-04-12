@@ -27,9 +27,9 @@ public partial class LDtkLevel
 
     /// <summary> Gets world size of the level in pixels. </summary>
     [JsonIgnore]
-    public Point Size => new(PxWid, PxHei);
+    public Point Size => new(PixelWidth, PixelHeight);
 
-    /// <summary> Gets a value indicating whether the file been loaded externaly. </summary>
+    /// <summary> Gets a value indicating whether the file been loaded externally. </summary>
     [JsonIgnore]
     public bool Loaded { get; internal set; }
 
@@ -83,12 +83,12 @@ public partial class LDtkLevel
     {
         foreach (LayerInstance layer in LayerInstances ?? Array.Empty<LayerInstance>())
         {
-            if (layer._Identifier != identifier)
+            if (layer.Identifier != identifier)
             {
                 continue;
             }
 
-            if (layer._Type != LayerType.IntGrid)
+            if (layer.Type != LayerType.IntGrid)
             {
                 continue;
             }
@@ -102,8 +102,8 @@ public partial class LDtkLevel
             {
                 Values = layer.IntGridCsv,
                 WorldPosition = Position,
-                GridSize = new(layer._CWid, layer._CHei),
-                TileSize = layer._GridSize,
+                GridSize = new(layer.CellWidth, layer.CellHeight),
+                TileSize = layer.GridSize,
             };
         }
 
@@ -162,7 +162,7 @@ public partial class LDtkLevel
                 return GetEntityFromInstance<T>(entity);
             }
 
-            throw new LDtkException($"No EntityRef of type {typeof(T).Name} found in layer {layer._Identifier}");
+            throw new LDtkException($"No EntityRef of type {typeof(T).Name} found in layer {layer.Identifier}");
         }
 
         throw new LDtkException($"No EntityRef of type {typeof(T).Name} found in level {Identifier}");
@@ -176,11 +176,11 @@ public partial class LDtkLevel
 
         foreach (LayerInstance layer in LayerInstances ?? Array.Empty<LayerInstance>())
         {
-            if (layer._Type == LayerType.Entities)
+            if (layer.Type == LayerType.Entities)
             {
                 foreach (EntityInstance entityInstance in layer.EntityInstances)
                 {
-                    if (entityInstance._Identifier != typeof(T).Name)
+                    if (entityInstance.Identifier != typeof(T).Name)
                     {
                         continue;
                     }

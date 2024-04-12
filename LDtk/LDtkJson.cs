@@ -19,7 +19,7 @@ public partial class LDtkFile
 
     /// <summary> A structure containing all the definitions of this project </summary>
     [JsonPropertyName("defs")]
-    public Definitions Defs { get; set; }
+    public Definitions Definitions { get; set; }
 
     /// <summary> If TRUE, one file will be saved for the project (incl. all its definitions) and one file in a sub-folder for each level. </summary>
     [JsonPropertyName("externalLevels")]
@@ -27,7 +27,7 @@ public partial class LDtkFile
 
     /// <summary> This object is not actually used by LDtk. It ONLY exists to force explicit references to all types, to make sure QuickType finds them and integrate all of them. Otherwise, Quicktype will drop types that are not explicitely used. </summary>
     [JsonPropertyName("__FORCED_REFS")]
-    public object _FORCED_REFS { get; set; }
+    public object ForcedRefs { get; set; }
 
     /// <summary> Unique project identifier </summary>
     [JsonPropertyName("iid")]
@@ -199,7 +199,7 @@ public partial class EntityInstance
 {
     /// <summary> Reference of the <b>Entity definition</b> UID </summary>
     [JsonPropertyName("defUid")]
-    public int DefUid { get; set; }
+    public int DefinitionUid { get; set; }
 
     /// <summary> An array of all custom fields and their values. </summary>
     [JsonPropertyName("fieldInstances")]
@@ -207,7 +207,7 @@ public partial class EntityInstance
 
     /// <summary> Grid-based coordinates (<c>[x,y]</c> format) </summary>
     [JsonPropertyName("__grid")]
-    public Point _Grid { get; set; }
+    public Point Grid { get; set; }
 
     /// <summary> Entity height in pixels. For non-resizable entities, it will be the same as Entity definition. </summary>
     [JsonPropertyName("height")]
@@ -215,7 +215,7 @@ public partial class EntityInstance
 
     /// <summary> Entity definition identifier </summary>
     [JsonPropertyName("__identifier")]
-    public string _Identifier { get; set; }
+    public string Identifier { get; set; }
 
     /// <summary> Unique instance identifier </summary>
     [JsonPropertyName("iid")]
@@ -223,23 +223,23 @@ public partial class EntityInstance
 
     /// <summary> Pivot coordinates  (<c>[x,y]</c> format, values are from 0 to 1) of the Entity </summary>
     [JsonPropertyName("__pivot")]
-    public Vector2 _Pivot { get; set; }
+    public Vector2 Pivot { get; set; }
 
     /// <summary> Pixel coordinates (<c>[x,y]</c> format) in current level coordinate space. Don't forget optional layer offsets, if they exist! </summary>
     [JsonPropertyName("px")]
-    public Point Px { get; set; }
+    public Point PixelCoord { get; set; }
 
     /// <summary> The entity "smart" color, guessed from either Entity definition, or one its field instances. </summary>
     [JsonPropertyName("__smartColor")]
-    public Color _SmartColor { get; set; }
+    public Color SmartColor { get; set; }
 
     /// <summary> Array of tags defined in this Entity definition </summary>
     [JsonPropertyName("__tags")]
-    public string[] _Tags { get; set; }
+    public string[] Tags { get; set; }
 
     /// <summary> Optional TilesetRect used to display this entity (it could either be the default Entity tile, or some tile provided by a field value, like an Enum). </summary>
     [JsonPropertyName("__tile")]
-    public TilesetRectangle? _Tile { get; set; }
+    public TilesetRectangle? Tile { get; set; }
 
     /// <summary> Entity width in pixels. For non-resizable entities, it will be the same as Entity definition. </summary>
     [JsonPropertyName("width")]
@@ -247,11 +247,11 @@ public partial class EntityInstance
 
     /// <summary> X world coordinate in pixels. Only available in GridVania or Free world layouts. </summary>
     [JsonPropertyName("__worldX")]
-    public int? _WorldX { get; set; }
+    public int? WorldX { get; set; }
 
     /// <summary> Y world coordinate in pixels Only available in GridVania or Free world layouts. </summary>
     [JsonPropertyName("__worldY")]
-    public int? _WorldY { get; set; }
+    public int? WorldY { get; set; }
 }
 
 /// <summary> This object describes the "location" of an Entity instance in the project worlds. </summary>
@@ -335,23 +335,23 @@ public partial class FieldInstance
 {
     /// <summary> Reference of the <b>Field definition</b> UID </summary>
     [JsonPropertyName("defUid")]
-    public int DefUid { get; set; }
+    public int DefinitionUid { get; set; }
 
     /// <summary> Field definition identifier </summary>
     [JsonPropertyName("__identifier")]
-    public string _Identifier { get; set; }
+    public string Identifier { get; set; }
 
     /// <summary> Optional TilesetRect used to display this field (this can be the field own Tile, or some other Tile guessed from the value, like an Enum). </summary>
     [JsonPropertyName("__tile")]
-    public TilesetRectangle? _Tile { get; set; }
+    public TilesetRectangle? Tile { get; set; }
 
     /// <summary> Type of the field, such as <c>Int</c>, <c>Float</c>, <c>String</c>, <c>Enum(my_enum_name)</c>, <c>Bool</c>, etc.<br/>  NOTE: if you enable the advanced option <b>Use Multilines type</b>, you will have "*Multilines*" instead of "*String*" when relevant. </summary>
     [JsonPropertyName("__type")]
-    public string _Type { get; set; }
+    public string Type { get; set; }
 
     /// <summary> Actual value of the field instance. The value type varies, depending on <c>__type</c>:<br/>   - For <b>classic types</b> (ie. Integer, Float, Boolean, String, Text and FilePath), you just get the actual value with the expected type.<br/>   - For <b>Color</b>, the value is an hexadecimal string using "#rrggbb" format.<br/>   - For <b>Enum</b>, the value is a String representing the selected enum value.<br/>   - For <b>Point</b>, the value is a [GridPoint](#ldtk-GridPoint) object.<br/>   - For <b>Tile</b>, the value is a [TilesetRect](#ldtk-TilesetRect) object.<br/>   - For <b>EntityRef</b>, the value is an [EntityReferenceInfos](#ldtk-EntityReferenceInfos) object.<br/><br/>  If the field is an array, then this <c>__value</c> will also be a JSON array. </summary>
     [JsonPropertyName("__value")]
-    public object _Value { get; set; }
+    public object Value { get; set; }
 }
 
 /// <summary> This object is just a grid-based coordinate used in Field values. </summary>
@@ -359,11 +359,11 @@ public partial class GridPoint
 {
     /// <summary> X grid-based coordinate </summary>
     [JsonPropertyName("cx")]
-    public int Cx { get; set; }
+    public int X { get; set; }
 
     /// <summary> Y grid-based coordinate </summary>
     [JsonPropertyName("cy")]
-    public int Cy { get; set; }
+    public int Y { get; set; }
 }
 
 /// <summary> IntGrid value definition </summary>
@@ -415,7 +415,7 @@ public partial class IntGridValueInstance
 
     /// <summary> IntGrid value </summary>
     [JsonPropertyName("v")]
-    public int V { get; set; }
+    public int Value { get; set; }
 }
 
 /// <summary> Layer definition </summary>
@@ -471,7 +471,7 @@ public partial class LayerDefinition
 
     /// <summary> Type of the layer (*IntGrid, Entities, Tiles or AutoLayer*) </summary>
     [JsonPropertyName("__type")]
-    public LayerType _Type { get; set; }
+    public LayerType Type { get; set; }
 
     /// <summary> Unique Int identifier </summary>
     [JsonPropertyName("uid")]
@@ -487,11 +487,11 @@ public partial class LayerInstance
 
     /// <summary> Grid-based height </summary>
     [JsonPropertyName("__cHei")]
-    public int _CHei { get; set; }
+    public int CellHeight { get; set; }
 
     /// <summary> Grid-based width </summary>
     [JsonPropertyName("__cWid")]
-    public int _CWid { get; set; }
+    public int CellWidth { get; set; }
 
     /// <summary> EntityInstances </summary>
     [JsonPropertyName("entityInstances")]
@@ -499,15 +499,15 @@ public partial class LayerInstance
 
     /// <summary> Grid size </summary>
     [JsonPropertyName("__gridSize")]
-    public int _GridSize { get; set; }
+    public int GridSize { get; set; }
 
-    /// <summary> GridTiles </summary>
+    /// <summary> GridTiles - A basic "Tiles" layer </summary>
     [JsonPropertyName("gridTiles")]
     public TileInstance[] GridTiles { get; set; }
 
     /// <summary> Layer definition identifier </summary>
     [JsonPropertyName("__identifier")]
-    public string _Identifier { get; set; }
+    public string Identifier { get; set; }
 
     /// <summary> Unique layer instance identifier </summary>
     [JsonPropertyName("iid")]
@@ -527,7 +527,7 @@ public partial class LayerInstance
 
     /// <summary> Layer opacity as Float [0-1] </summary>
     [JsonPropertyName("__opacity")]
-    public float _Opacity { get; set; }
+    public float Opacity { get; set; }
 
     /// <summary> This layer can use another tileset by overriding the tileset UID here. </summary>
     [JsonPropertyName("overrideTilesetUid")]
@@ -535,31 +535,31 @@ public partial class LayerInstance
 
     /// <summary> X offset in pixels to render this layer, usually 0 (IMPORTANT: this should be added to the <c>LayerDef</c> optional offset, so you should probably prefer using <c>__pxTotalOffsetX</c> which contains the total offset value) </summary>
     [JsonPropertyName("pxOffsetX")]
-    public int PxOffsetX { get; set; }
+    public int OffsetX { get; set; }
 
     /// <summary> Y offset in pixels to render this layer, usually 0 (IMPORTANT: this should be added to the <c>LayerDef</c> optional offset, so you should probably prefer using <c>__pxTotalOffsetX</c> which contains the total offset value) </summary>
     [JsonPropertyName("pxOffsetY")]
-    public int PxOffsetY { get; set; }
+    public int OffsetY { get; set; }
 
     /// <summary> Total layer X pixel offset, including both instance and definition offsets. </summary>
     [JsonPropertyName("__pxTotalOffsetX")]
-    public int _PxTotalOffsetX { get; set; }
+    public int PixelTotalOffsetX { get; set; }
 
     /// <summary> Total layer Y pixel offset, including both instance and definition offsets. </summary>
     [JsonPropertyName("__pxTotalOffsetY")]
-    public int _PxTotalOffsetY { get; set; }
+    public int PixelTotalOffsetY { get; set; }
 
     /// <summary> The definition UID of corresponding Tileset, if any. </summary>
     [JsonPropertyName("__tilesetDefUid")]
-    public int? _TilesetDefUid { get; set; }
+    public int? TilesetDefUid { get; set; }
 
     /// <summary> The relative path to corresponding Tileset, if any. </summary>
     [JsonPropertyName("__tilesetRelPath")]
-    public string? _TilesetRelPath { get; set; }
+    public string? TilesetRelPath { get; set; }
 
     /// <summary> Layer type (possible values: IntGrid, Entities, Tiles or AutoLayer) </summary>
     [JsonPropertyName("__type")]
-    public LayerType _Type { get; set; }
+    public LayerType Type { get; set; }
 
     /// <summary> Layer instance visibility </summary>
     [JsonPropertyName("visible")]
@@ -571,11 +571,11 @@ public partial class LDtkLevel
 {
     /// <summary> Background color of the level (same as <c>bgColor</c>, except the default value is automatically used here if its value is <c>null</c>) </summary>
     [JsonPropertyName("__bgColor")]
-    public Color _BgColor { get; set; }
+    public Color BgColor { get; set; }
 
     /// <summary> Position informations of the background image, if there is one. </summary>
     [JsonPropertyName("__bgPos")]
-    public LevelBackgroundPosition? _BgPos { get; set; }
+    public LevelBackgroundPosition? BgPos { get; set; }
 
     /// <summary> The *optional* relative path to the level background image. </summary>
     [JsonPropertyName("bgRelPath")]
@@ -603,15 +603,15 @@ public partial class LDtkLevel
 
     /// <summary> An array listing all other levels touching this one on the world map. Since 1.4.0, this includes levels that overlap in the same world layer, or in nearby world layers.<br/>  Only relevant for world layouts where level spatial positioning is manual (ie. GridVania, Free). For Horizontal and Vertical layouts, this array is always empty. </summary>
     [JsonPropertyName("__neighbours")]
-    public NeighbourLevel[] _Neighbours { get; set; }
+    public NeighbourLevel[] Neighbours { get; set; }
 
     /// <summary> Height of the level in pixels </summary>
     [JsonPropertyName("pxHei")]
-    public int PxHei { get; set; }
+    public int PixelHeight { get; set; }
 
     /// <summary> Width of the level in pixels </summary>
     [JsonPropertyName("pxWid")]
-    public int PxWid { get; set; }
+    public int PixelWidth { get; set; }
 
     /// <summary> Unique Int identifier </summary>
     [JsonPropertyName("uid")]
@@ -643,7 +643,7 @@ public partial class LevelBackgroundPosition
 
     /// <summary> An array containing the <c>[x,y]</c> pixel coordinates of the top-left corner of the <b>cropped</b> background image, depending on <c>bgPos</c> option. </summary>
     [JsonPropertyName("topLeftPx")]
-    public Point TopLeftPx { get; set; }
+    public Point TopLeftPixel { get; set; }
 }
 
 /// <summary> Nearby level info </summary>
@@ -651,7 +651,7 @@ public partial class NeighbourLevel
 {
     /// <summary> A lowercase string tipping on the level location (<c>n</c>orth, <c>s</c>outh, <c>w</c>est, <c>e</c>ast).<br/>  Since 1.4.0, this value can also be &lt; (neighbour depth is lower), &gt; (neighbour depth is greater) or <c>o</c> (levels overlap and share the same world depth).<br/>  Since 1.5.3, this value can also be <c>nw</c>,<c>ne</c>,<c>sw</c> or <c>se</c> for levels only touching corners. </summary>
     [JsonPropertyName("dir")]
-    public string Dir { get; set; }
+    public string Direction { get; set; }
 
     /// <summary> Neighbour Instance Identifier </summary>
     [JsonPropertyName("levelIid")]
@@ -675,15 +675,15 @@ public partial class TileInstance
 {
     /// <summary> Alpha/opacity of the tile (0-1, defaults to 1) </summary>
     [JsonPropertyName("a")]
-    public float A { get; set; }
+    public float Alpha { get; set; }
 
     /// <summary> "Flip bits", a 2-bits integer to represent the mirror transformations of the tile.<br/>   - Bit 0 = X flip<br/>   - Bit 1 = Y flip<br/>   Examples: f=0 (no flip), f=1 (X flip only), f=2 (Y flip only), f=3 (both flips) </summary>
     [JsonPropertyName("f")]
-    public int F { get; set; }
+    public int FlipBits { get; set; }
 
     /// <summary> Pixel coordinates of the tile in the <b>layer</b> (<c>[x,y]</c> format). Don't forget optional layer offsets, if they exist! </summary>
     [JsonPropertyName("px")]
-    public Point Px { get; set; }
+    public Point Position { get; set; }
 
     /// <summary> Pixel coordinates of the tile in the <b>tileset</b> (<c>[x,y]</c> format) </summary>
     [JsonPropertyName("src")]
@@ -691,7 +691,7 @@ public partial class TileInstance
 
     /// <summary> The *Tile ID* in the corresponding tileset. </summary>
     [JsonPropertyName("t")]
-    public int T { get; set; }
+    public int TileId { get; set; }
 }
 
 /// <summary> In a tileset definition, user defined meta-data of a tile. </summary>
@@ -711,7 +711,7 @@ public partial class TilesetDefinition
 {
     /// <summary> Grid-based height </summary>
     [JsonPropertyName("__cHei")]
-    public int _CHei { get; set; }
+    public int CellHeight { get; set; }
 
     /// <summary> An array of custom tile metadata </summary>
     [JsonPropertyName("customData")]
@@ -719,7 +719,7 @@ public partial class TilesetDefinition
 
     /// <summary> Grid-based width </summary>
     [JsonPropertyName("__cWid")]
-    public int _CWid { get; set; }
+    public int CellWidth { get; set; }
 
     /// <summary> If this value is set, then it means that this atlas uses an internal LDtk atlas image instead of a loaded one. Possible values: &lt;<c>null</c>&gt;, <c>LdtkIcons</c>, <c>null</c> </summary>
     [JsonPropertyName("embedAtlas")]
@@ -739,15 +739,15 @@ public partial class TilesetDefinition
 
     /// <summary> Image height in pixels </summary>
     [JsonPropertyName("pxHei")]
-    public int PxHei { get; set; }
+    public int PixelHeight { get; set; }
 
     /// <summary> Image width in pixels </summary>
     [JsonPropertyName("pxWid")]
-    public int PxWid { get; set; }
+    public int PixelWidth { get; set; }
 
     /// <summary> Path to the source file, relative to the current project JSON file<br/>  It can be null if no image was provided, or when using an embed atlas. </summary>
     [JsonPropertyName("relPath")]
-    public string? RelPath { get; set; }
+    public string? RelativePath { get; set; }
 
     /// <summary> Space in pixels between all tiles </summary>
     [JsonPropertyName("spacing")]
@@ -775,7 +775,7 @@ public partial class TilesetRectangle
 {
     /// <summary> Height in pixels </summary>
     [JsonPropertyName("h")]
-    public int H { get; set; }
+    public int Height { get; set; }
 
     /// <summary> UID of the tileset </summary>
     [JsonPropertyName("tilesetUid")]
@@ -783,7 +783,7 @@ public partial class TilesetRectangle
 
     /// <summary> Width in pixels </summary>
     [JsonPropertyName("w")]
-    public int W { get; set; }
+    public int Width { get; set; }
 
     /// <summary> X pixels coordinate of the top-left corner in the Tileset image </summary>
     [JsonPropertyName("x")]
@@ -803,7 +803,7 @@ public partial class TocInstanceData
 
     /// <summary> HeiPx </summary>
     [JsonPropertyName("heiPx")]
-    public int HeiPx { get; set; }
+    public int Height { get; set; }
 
     /// <summary> IID information of this instance </summary>
     [JsonPropertyName("iids")]
@@ -811,7 +811,7 @@ public partial class TocInstanceData
 
     /// <summary> WidPx </summary>
     [JsonPropertyName("widPx")]
-    public int WidPx { get; set; }
+    public int Width { get; set; }
 
     /// <summary> WorldX </summary>
     [JsonPropertyName("worldX")]

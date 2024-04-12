@@ -144,12 +144,12 @@ public class LDtkRenderer : IDisposable
         {
             LayerInstance layer = layers[i];
 
-            if (layer._TilesetRelPath == null)
+            if (layer.TilesetRelPath == null)
             {
                 continue;
             }
 
-            if (layer._Type == LayerType.Entities)
+            if (layer.Type == LayerType.Entities)
             {
                 continue;
             }
@@ -161,22 +161,22 @@ public class LDtkRenderer : IDisposable
 
     Texture2D RenderLayer(LayerInstance layer, LDtkLevel level)
     {
-        Texture2D texture = GetTexture(level, layer._TilesetRelPath);
+        Texture2D texture = GetTexture(level, layer.TilesetRelPath);
 
-        int width = layer._CWid * layer._GridSize;
-        int height = layer._CHei * layer._GridSize;
+        int width = layer.CellWidth * layer.GridSize;
+        int height = layer.CellHeight * layer.GridSize;
         RenderTarget2D renderTarget = new(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
         graphicsDevice.SetRenderTarget(renderTarget);
 
-        switch (layer._Type)
+        switch (layer.Type)
         {
             case LayerType.Tiles:
-            foreach (TileInstance tile in layer.GridTiles.Where(_ => layer._TilesetDefUid.HasValue))
+            foreach (TileInstance tile in layer.GridTiles.Where(_ => layer.TilesetDefUid.HasValue))
             {
-                Vector2 position = new(tile.Px.X + layer._PxTotalOffsetX, tile.Px.Y + layer._PxTotalOffsetY);
-                Rectangle rect = new(tile.Src.X, tile.Src.Y, layer._GridSize, layer._GridSize);
-                SpriteEffects mirror = (SpriteEffects)tile.F;
+                Vector2 position = new(tile.Position.X + layer.PixelTotalOffsetX, tile.Position.Y + layer.PixelTotalOffsetY);
+                Rectangle rect = new(tile.Src.X, tile.Src.Y, layer.GridSize, layer.GridSize);
+                SpriteEffects mirror = (SpriteEffects)tile.FlipBits;
                 SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
             }
             break;
@@ -185,11 +185,11 @@ public class LDtkRenderer : IDisposable
             case LayerType.IntGrid:
             if (layer.AutoLayerTiles.Length > 0)
             {
-                foreach (TileInstance tile in layer.AutoLayerTiles.Where(_ => layer._TilesetDefUid.HasValue))
+                foreach (TileInstance tile in layer.AutoLayerTiles.Where(_ => layer.TilesetDefUid.HasValue))
                 {
-                    Vector2 position = new(tile.Px.X + layer._PxTotalOffsetX, tile.Px.Y + layer._PxTotalOffsetY);
-                    Rectangle rect = new(tile.Src.X, tile.Src.Y, layer._GridSize, layer._GridSize);
-                    SpriteEffects mirror = (SpriteEffects)tile.F;
+                    Vector2 position = new(tile.Position.X + layer.PixelTotalOffsetX, tile.Position.Y + layer.PixelTotalOffsetY);
+                    Rectangle rect = new(tile.Src.X, tile.Src.Y, layer.GridSize, layer.GridSize);
+                    SpriteEffects mirror = (SpriteEffects)tile.FlipBits;
                     SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
                 }
             }
@@ -203,14 +203,14 @@ public class LDtkRenderer : IDisposable
     {
         Texture2D texture = GetTexture(level, level.BgRelPath);
 
-        RenderTarget2D layer = new(graphicsDevice, level.PxWid, level.PxHei, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
+        RenderTarget2D layer = new(graphicsDevice, level.PixelWidth, level.PixelHeight, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
         graphicsDevice.SetRenderTarget(layer);
         {
-            LevelBackgroundPosition? bg = level._BgPos;
+            LevelBackgroundPosition? bg = level.BgPos;
             if (bg != null)
             {
-                Vector2 pos = bg.TopLeftPx.ToVector2();
+                Vector2 pos = bg.TopLeftPixel.ToVector2();
                 SpriteBatch.Draw(texture, pos, new Rectangle((int)bg.CropRect[0], (int)bg.CropRect[1], (int)bg.CropRect[2], (int)bg.CropRect[3]), Color.White, 0, Vector2.Zero, bg.Scale, SpriteEffects.None, 0);
             }
         }
