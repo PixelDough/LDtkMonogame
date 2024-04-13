@@ -22,10 +22,10 @@ public class LDtkRenderer : IDisposable
     public SpriteBatch SpriteBatch { get; set; }
 
     /// <summary> Gets or sets the levels identifier to layers Dictionary. </summary>
-    Dictionary<string, RenderedLevel> PrerenderedLevels { get; } = new();
+    Dictionary<string, RenderedLevel> PrerenderedLevels { get; } = [];
 
     /// <summary> Gets or sets the levels identifier to layers Dictionary. </summary>
-    Dictionary<string, Texture2D> TilemapCache { get; } = new();
+    Dictionary<string, Texture2D> TilemapCache { get; } = [];
 
     readonly Texture2D pixel;
     readonly Texture2D error;
@@ -107,7 +107,7 @@ public class LDtkRenderer : IDisposable
         SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
         {
             Texture2D renderedLayer = RenderLayer(layer, level);
-            renderLayer.Layers = new[] { renderedLayer };
+            renderLayer.Layers = [renderedLayer];
         }
 
         SpriteBatch.End();
@@ -118,7 +118,7 @@ public class LDtkRenderer : IDisposable
 
     Texture2D[] RenderLayers(LDtkLevel level)
     {
-        List<Texture2D> layers = new();
+        List<Texture2D> layers = [];
 
         if (level.BgRelPath != null)
         {
@@ -137,7 +137,7 @@ public class LDtkRenderer : IDisposable
     
     Texture2D[] RenderLayers(LayerInstance[] layers, LDtkLevel level)
     {
-        List<Texture2D> results = new();
+        List<Texture2D> results = [];
         
         // Render Tile, Auto and Int grid layers
         for (int i = layers.Length - 1; i >= 0; i--)

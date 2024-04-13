@@ -98,7 +98,7 @@ public partial class LDtkLevel
                 continue;
             }
 
-            return new()
+            return new LDtkIntGrid
             {
                 Values = layer.IntGridCsv,
                 WorldPosition = Position,
