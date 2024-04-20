@@ -109,7 +109,6 @@ public class LDtkRenderer : IDisposable
             Texture2D renderedLayer = RenderLayer(layer, level);
             renderLayer.Layers = [renderedLayer];
         }
-
         SpriteBatch.End();
 
         PrerenderedLevels.Add(identifier, renderLayer);
@@ -161,39 +160,40 @@ public class LDtkRenderer : IDisposable
 
     Texture2D RenderLayer(LayerInstance layer, LDtkLevel level)
     {
-        Texture2D texture = GetTexture(level, layer.TilesetRelPath);
-
         int width = layer.CellWidth * layer.GridSize;
         int height = layer.CellHeight * layer.GridSize;
         RenderTarget2D renderTarget = new(graphicsDevice, width, height, false, SurfaceFormat.Color, DepthFormat.None, 0, RenderTargetUsage.PreserveContents);
 
         graphicsDevice.SetRenderTarget(renderTarget);
 
+        Texture2D texture;
         switch (layer.Type)
         {
             case LayerType.Tiles:
-            foreach (TileInstance tile in layer.GridTiles.Where(_ => layer.TilesetDefUid.HasValue))
-            {
-                Vector2 position = new(tile.Position.X + layer.PixelTotalOffsetX, tile.Position.Y + layer.PixelTotalOffsetY);
-                Rectangle rect = new(tile.Src.X, tile.Src.Y, layer.GridSize, layer.GridSize);
-                SpriteEffects mirror = (SpriteEffects)tile.FlipBits;
-                SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
-            }
-            break;
-
-            case LayerType.AutoLayer:
-            case LayerType.IntGrid:
-            if (layer.AutoLayerTiles.Length > 0)
-            {
-                foreach (TileInstance tile in layer.AutoLayerTiles.Where(_ => layer.TilesetDefUid.HasValue))
+                texture = GetTexture(level, layer.TilesetRelPath);
+                foreach (TileInstance tile in layer.GridTiles.Where(_ => layer.TilesetDefUid.HasValue))
                 {
                     Vector2 position = new(tile.Position.X + layer.PixelTotalOffsetX, tile.Position.Y + layer.PixelTotalOffsetY);
                     Rectangle rect = new(tile.Src.X, tile.Src.Y, layer.GridSize, layer.GridSize);
                     SpriteEffects mirror = (SpriteEffects)tile.FlipBits;
                     SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
                 }
-            }
-            break;
+                break;
+
+            case LayerType.AutoLayer:
+            case LayerType.IntGrid:
+                texture = GetTexture(level, layer.TilesetRelPath);
+                if (layer.AutoLayerTiles.Length > 0)
+                {
+                    foreach (TileInstance tile in layer.AutoLayerTiles.Where(_ => layer.TilesetDefUid.HasValue))
+                    {
+                        Vector2 position = new(tile.Position.X + layer.PixelTotalOffsetX, tile.Position.Y + layer.PixelTotalOffsetY);
+                        Rectangle rect = new(tile.Src.X, tile.Src.Y, layer.GridSize, layer.GridSize);
+                        SpriteEffects mirror = (SpriteEffects)tile.FlipBits;
+                        SpriteBatch.Draw(texture, position, rect, Color.White, 0, Vector2.Zero, 1f, mirror, 0);
+                    }
+                }
+                break;
         }
 
         return renderTarget;
